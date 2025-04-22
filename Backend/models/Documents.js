@@ -16,3 +16,4 @@ const documentSchema = new Schema(
 
 const Document = mongoose.model('Document', documentSchema);
 module.exports = Document;
+module.exports.documentSchema = documentSchema;
