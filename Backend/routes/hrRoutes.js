@@ -3,6 +3,9 @@ const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 const OnboardingToken = require("../models/OnboardingToken");
 const Employee = require("../models/Employees");
+const { verifyToken, requireHR } = require("../middlewares/verifyToken");
+
+router.use(verifyToken, requireHR);
 
 router.get("/employees", async (req, res) => {
   const employees = await Employee.find({}, "-password");
