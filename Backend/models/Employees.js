@@ -1,6 +1,8 @@
 const mongoose = require('../mongoConnect');
-const documentSchema = require('./Documents');
-const contactSchema = require('./Contact');
+const { documentSchema } = require('./Documents');
+// const contactSchema = require('./Contact');
+const { contactSchema } = require('./Contact');
+
 const { Schema } = mongoose;
 
 const employeeSchema = new Schema(
