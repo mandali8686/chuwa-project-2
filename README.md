@@ -6,5 +6,6 @@ npm i
 
 ```
 cd Frontend
+cd employee-management
 npm i
 ```
