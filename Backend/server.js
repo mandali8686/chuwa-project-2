@@ -1,24 +1,21 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+const express = require("express");
+const cors = require("cors");
+require("./mongoConnect");
 
-const employeeRoutes = require('./routes/Employees');
-const documentRoutes = require('./routes/Documents');
-const contactRoutes = require('./routes/Contact');
+const authRoutes = require("./routes/authRoutes");
+const hrRoutes = require("./routes/hrRoutes");
+const documentRoutes = require("./routes/documentRoutes");
 
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
-
-// API routes
-app.use('/api/employees', employeeRoutes);
-app.use('/api/documents', documentRoutes);
-app.use('/api/contacts', contactRoutes);
-
-
-
 const port = 5400;
 
+app.use(cors());
+app.use(express.json());
+
+app.use("/api/auth", authRoutes);
+app.use("/api/hr", hrRoutes);
+app.use("/api/documents", documentRoutes);
+
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
-  });
+  console.log(`Server running at http://localhost:${port}`);
+});
