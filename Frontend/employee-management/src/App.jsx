@@ -1,10 +1,12 @@
-import { Routes, Route } from 'react-router-dom';
-import ProtectedRoute from './components/ProtectedRoute';
-import Layout from './components/Layout';
-import SignIn from './components/SignIn/SignIn';
-import PersonalInformation from './components/PersonInfo/PersonInfo';
-function App() {
+import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Layout from "./components/Layout";
+import SignIn from "./components/SignIn/SignIn";
+import PersonalInformation from "./components/PersonInfo/PersonInfo";
+import RegisterToken from "./features/hr/RegisterToken";
+import DocumentReview from "./features/hr/DocumentReview";
 
+function App() {
   // useEffect(() => {
   //   const token = localStorage.getItem('token');
   //   const storedUser = localStorage.getItem('user');
@@ -24,18 +26,21 @@ function App() {
 
   return (
     //  isLoaded ? (
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/person-info" element={<PersonalInformation />} />
-          <Route path="/" element={<SignIn />} />
-          {/* <Route path='/email-sent' element={<EmailSent />} /> */}
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/person-info" element={<PersonalInformation />} />
+        <Route path="/" element={<SignIn />} />
+        <Route path="/hr/register-token" element={<RegisterToken />} />
 
-          {/* <Route element={<ProtectedRoute />}>
+        <Route path="/hr/documents" element={<DocumentReview />} />
+        {/* <Route path='/email-sent' element={<EmailSent />} /> */}
+
+        {/* <Route element={<ProtectedRoute />}>
 
           </Route> */}
-        </Route>
-      </Routes>
+      </Route>
+    </Routes>
     // ) : (
     //   <div>Loading...</div>
     // )
