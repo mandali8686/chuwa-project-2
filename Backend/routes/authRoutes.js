@@ -11,13 +11,16 @@ router.post("/login", async (req, res) => {
   const user = await Employee.findOne({ username });
   if (!user) return res.status(401).json({ msg: "User not found" });
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) return res.status(401).json({ msg: "Invalid credentials" });
+  // const isMatch = await bcrypt.compare(password, user.password);
+  // if (!isMatch) return res.status(401).json({ msg: "Invalid credentials" });
+  if (password !== user.password) {
+    return res.status(401).json({ msg: "Invalid credentials" });
+  }
 
   const token = jwt.sign({ userId: user._id }, "jwtSecret", {
     expiresIn: "1h",
   });
-  res.json({ token, role: user.role });
+  res.json({ token:token, user:{role: user.role, userId:user._id} });
 });
 
 router.post("/register", async (req, res) => {
