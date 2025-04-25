@@ -1,35 +1,25 @@
+import React from "react";
 import { Routes, Route } from "react-router-dom";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute"; // optional, unused for now
 import Layout from "./components/Layout";
-import SignIn from "./components/SignIn/SignIn";
-import PersonalInformation from "./components/PersonInfo/PersonInfo";
-import RegisterToken from "./features/hr/RegisterToken";
-import DocumentReview from "./features/hr/DocumentReview";
 import Application from "./components/Application/Application";
 import Register from "./components/SignIn/Register";
 
+import SignIn from "./components/SignIn/SignIn";
+import PersonalInformation from "./components/PersonInfo/PersonInfo";
+
+// HR Components
+import Dashboard from "./components/hr/Dashboard";
+import EmployeeList from "./components/hr/EmployeeList";
+import DocumentReview from "./components/hr/DocumentReview";
+import RegisterToken from "./components/hr/RegisterToken";
+
 function App() {
-  // useEffect(() => {
-  //   const token = localStorage.getItem('token');
-  //   const storedUser = localStorage.getItem('user');
-  //   if (token && storedUser) {
-  //     const parsedUser = JSON.parse(storedUser);
-  //     dispatch(setCurrentUser(parsedUser));
-  //     dispatch(fetchCart(parsedUser._id));
-  //   }
-  //   setIsLoaded(true)
-  // }, [dispatch]);
-
-  // useEffect(() => {
-  //   if (user) {
-  //     dispatch(fetchCart(user._id));
-  //   }
-  // }, [user, dispatch]);
-
   return (
-    //  isLoaded ? (
     <Routes>
       <Route element={<Layout />}>
+        {/* General Routes */}
+        <Route path="/" element={<SignIn />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/person-info" element={<PersonalInformation />} />
         <Route path="/application" element={<Application />} />
@@ -37,17 +27,13 @@ function App() {
         <Route path="/" element={<SignIn />} />
         <Route path="/hr/register-token" element={<RegisterToken />} />
 
+        {/* HR Routes */}
+        <Route path="/hr/dashboard" element={<Dashboard />} />
+        <Route path="/hr/employees" element={<EmployeeList />} />
         <Route path="/hr/documents" element={<DocumentReview />} />
-        {/* <Route path='/email-sent' element={<EmailSent />} /> */}
-
-        {/* <Route element={<ProtectedRoute />}>
-
-          </Route> */}
+        <Route path="/hr/register-token" element={<RegisterToken />} />
       </Route>
     </Routes>
-    // ) : (
-    //   <div>Loading...</div>
-    // )
   );
 }
 
