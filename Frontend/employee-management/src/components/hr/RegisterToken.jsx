@@ -10,7 +10,12 @@ const RegisterToken = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(generateToken(email));
+    // console.log('Email in UI',email);
+  if (!email.trim()) {
+    alert("Please enter a valid email address.");
+    return;
+  }
+  dispatch(generateToken({ email:email }));
   };
 
   return (

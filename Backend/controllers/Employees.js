@@ -22,13 +22,14 @@ exports.getEmployeeById = async (req, res) => {
 };
 
 // Create a new employee
-exports.createEmployee = async (req, res) => {
+exports.createEmployee = async (employeeData) => {
   try {
-    const newEmployee = new Employee(req.body);
+    const newEmployee = new Employee(employeeData);
     await newEmployee.save();
-    res.status(201).json(newEmployee);
+    console.log('Emp Ctrl:', newEmployee);
+    return newEmployee; 
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    throw new Error(err.message); 
   }
 };
 

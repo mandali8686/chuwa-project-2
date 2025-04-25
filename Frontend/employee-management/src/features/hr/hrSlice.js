@@ -1,8 +1,7 @@
-// src/redux/hrSlice.js
-
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { makeHTTPGETRequest, makeHTTPPOSTRequest } from "../../api/abstract";
 
-// --------------------- Async Thunks ---------------------
+
 export const fetchEmployees = createAsyncThunk(
   "api/hr/fetchEmployees",
   async () => {
@@ -25,13 +24,16 @@ export const reviewEmployee = createAsyncThunk(
   }
 );
 
-export const generateToken = createAsyncThunk("api/hr/generateToken", async () => {
-  const res = await fetch("http://localhost:5400/api/hr/token", {
-    method: "POST",
+export const generateToken = createAsyncThunk(
+  "api/hr/generateToken", async ({ email }, { rejectWithValue }) => {
+    try {
+      console.log('Useremail', email);
+      const data = await makeHTTPPOSTRequest('api/hr/token', { email });
+      return data;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
   });
-  if (!res.ok) throw new Error("Failed to generate token");
-  return await res.json(); // e.g., { token: 'xxxxxx' }
-});
 
 export const fetchDocuments = createAsyncThunk(
   "hr/fetchDocuments",
