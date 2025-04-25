@@ -1,19 +1,19 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { makeHTTPPOSTRequest, makeHTTPPUTRequest, makeHTTPGETRequest } from '../../api/abstract';
+// src/features/hr/index.js
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { makeHTTPGETRequest, makeHTTPPATCHRequest } from "../../api/abstract";
 
 const initialState = {
-  token: null,
+  employees: [],
+  documents: [],
   loading: false,
-  currentUser: null,
-  isAuthenticated: false,
-  error: null
+  error: null,
 };
 
-export const createUserAsync = createAsyncThunk(
-  'user/createUser',
-  async (userData, { rejectWithValue }) => {
+export const fetchEmployees = createAsyncThunk(
+  "hr/fetchEmployees",
+  async (_, { rejectWithValue }) => {
     try {
-      const data = await makeHTTPPOSTRequest('api/users', userData);
+      const data = await makeHTTPGETRequest("api/hr/employees");
       return data;
     } catch (e) {
       return rejectWithValue(e.message);
@@ -21,11 +21,11 @@ export const createUserAsync = createAsyncThunk(
   }
 );
 
-export const loginUser = createAsyncThunk(
-  'user/login',
-  async ({ username, password }, { rejectWithValue }) => {
+export const fetchDocuments = createAsyncThunk(
+  "hr/fetchDocuments",
+  async (_, { rejectWithValue }) => {
     try {
-      const data = await makeHTTPPOSTRequest('api/auth/login', { username, password });
+      const data = await makeHTTPGETRequest("api/documents");
       return data;
     } catch (e) {
       return rejectWithValue(e.message);
@@ -33,11 +33,14 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-export const getUserById = createAsyncThunk(
-  'user/getUserById',
-  async (userId, { rejectWithValue }) => {
+export const reviewDocument = createAsyncThunk(
+  "hr/reviewDocument",
+  async ({ id, status, feedback }, { rejectWithValue }) => {
     try {
-      const data = await makeHTTPGETRequest(`api/employees/${userId}`);
+      const data = await makeHTTPPATCHRequest(`api/documents/${id}`, {
+        status,
+        feedback,
+      });
       return data;
     } catch (e) {
       return rejectWithValue(e.message);
@@ -45,119 +48,45 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-export const updatePassword = createAsyncThunk(
-  'user/updatePassword',
-  async ({ userId, newPassword }, { rejectWithValue }) => {
-    try {
-      const data = await makeHTTPPUTRequest(`api/users/${userId}`, { password: newPassword });
-      return data;
-    } catch (e) {
-      return rejectWithValue(e.message);
-    }
-  }
-);
-
-export const sendResetEmail = createAsyncThunk(
-  'user/sendResetEmail',
-  async (email, { rejectWithValue }) => {
-    try {
-      const data = await makeHTTPPOSTRequest('/api/users/reset-password', { email });
-      return data;
-    } catch (e) {
-      return rejectWithValue(e.message);
-    }
-  }
-);
-
-const userSlice = createSlice({
-  name: 'user',
+const hrSlice = createSlice({
+  name: "hr",
   initialState,
-  reducers: {
-    setCurrentUser: (state, action) => {
-      state.currentUser = action.payload;
-      state.isAuthenticated = !!action.payload;
-    },
-    clearUser: (state) => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      state.currentUser = null;
-      state.isAuthenticated = false;
-    },
-    clearError: (state) => {
-      state.error = null;
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(loginUser.pending, (state) => {
+      .addCase(fetchEmployees.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        localStorage.setItem('token', action.payload.token);
-        localStorage.setItem('userId', action.payload.userId);  
-        state.token = action.payload.token;
+      .addCase(fetchEmployees.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentUser = action.payload.user;
-        state.isAuthenticated = true;
-        state.error = null;
+        state.employees = action.payload;
       })
-      .addCase(loginUser.rejected, (state, action) => {
+      .addCase(fetchEmployees.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(createUserAsync.pending, (state) => {
+      .addCase(fetchDocuments.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(createUserAsync.fulfilled, (state) => {
+      .addCase(fetchDocuments.fulfilled, (state, action) => {
         state.loading = false;
-        state.error = null;
+        state.documents = action.payload;
       })
-      .addCase(createUserAsync.rejected, (state, action) => {
+      .addCase(fetchDocuments.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || action.error.message;
+        state.error = action.payload;
       })
-      .addCase(updatePassword.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updatePassword.fulfilled, (state, action) => {
-        state.loading = false;
-        state.currentUser = action.payload;
-        state.error = null;
-      })
-      .addCase(updatePassword.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || action.error.message;
-      })
-      .addCase(sendResetEmail.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(sendResetEmail.fulfilled, (state) => {
-        state.loading = false;
-        state.error = null;
-      })
-      .addCase(sendResetEmail.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || action.error.message;
-      })
-      .addCase(getUserById.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(getUserById.fulfilled, (state, action) => {
-        state.loading = false;
-        state.currentUser = action.payload; // Replace currentUser with the fetched data
-        state.error = null;
-      })
-      .addCase(getUserById.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || action.error.message;
-      });      
-  }
+      .addCase(reviewDocument.fulfilled, (state, action) => {
+        const index = state.documents.findIndex(
+          (doc) => doc._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.documents[index] = action.payload;
+        }
+      });
+  },
 });
 
-export const userReducer = userSlice.reducer;
-export const { setCurrentUser, clearUser, clearError } = userSlice.actions;
+export const hrReducer = hrSlice.reducer;
