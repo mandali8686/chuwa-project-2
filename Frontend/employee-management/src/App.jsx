@@ -5,6 +5,8 @@ import SignIn from "./components/SignIn/SignIn";
 import PersonalInformation from "./components/PersonInfo/PersonInfo";
 import RegisterToken from "./features/hr/RegisterToken";
 import DocumentReview from "./features/hr/DocumentReview";
+import Application from "./components/Application/Application";
+import Register from "./components/SignIn/Register";
 
 function App() {
   // useEffect(() => {
@@ -30,6 +32,8 @@ function App() {
       <Route element={<Layout />}>
         <Route path="/signin" element={<SignIn />} />
         <Route path="/person-info" element={<PersonalInformation />} />
+        <Route path="/application" element={<Application />} />
+        <Route path="/register/:token" element={<Register />} />
         <Route path="/" element={<SignIn />} />
         <Route path="/hr/register-token" element={<RegisterToken />} />
 
