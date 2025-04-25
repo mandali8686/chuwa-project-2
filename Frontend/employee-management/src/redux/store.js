@@ -1,11 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit';
-import logger from 'redux-logger'; // <-- import logger
-
-import { userReducer } from '../features/employee/index'
+import { configureStore } from "@reduxjs/toolkit";
+import logger from "redux-logger";
+import hrReducer from "./hrSlice";
 
 const store = configureStore({
   reducer: {
-    user: userReducer
+    hr: hrReducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
   devTools: true,
