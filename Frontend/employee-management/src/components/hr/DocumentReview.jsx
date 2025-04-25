@@ -1,7 +1,7 @@
 // src/components/hr/DocumentReview.jsx
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDocuments, deleteDocument } from "../../redux/hrSlice";
+import { fetchDocuments, deleteDocument } from "../../features/hr/hrSlice";
 
 const DocumentReview = () => {
   const dispatch = useDispatch();

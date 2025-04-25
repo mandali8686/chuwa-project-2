@@ -1,7 +1,7 @@
 // src/components/hr/RegisterToken.jsx
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { generateToken } from "../../redux/hrSlice";
+import { generateToken } from "../../features/hr/hrSlice";
 
 const RegisterToken = () => {
   const dispatch = useDispatch();

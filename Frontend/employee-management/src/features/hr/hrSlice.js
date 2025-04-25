@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // --------------------- Async Thunks ---------------------
 export const fetchEmployees = createAsyncThunk(
-  "hr/fetchEmployees",
+  "api/hr/fetchEmployees",
   async () => {
     const res = await fetch("http://localhost:5400/api/hr/employees");
     if (!res.ok) throw new Error("Failed to fetch employees");
@@ -13,7 +13,7 @@ export const fetchEmployees = createAsyncThunk(
 );
 
 export const reviewEmployee = createAsyncThunk(
-  "hr/reviewEmployee",
+  "api/hr/reviewEmployee",
   async ({ id, updates }) => {
     const res = await fetch(`http://localhost:5400/api/hr/employees/${id}`, {
       method: "PATCH",
@@ -25,7 +25,7 @@ export const reviewEmployee = createAsyncThunk(
   }
 );
 
-export const generateToken = createAsyncThunk("hr/generateToken", async () => {
+export const generateToken = createAsyncThunk("api/hr/generateToken", async () => {
   const res = await fetch("http://localhost:5400/api/hr/token", {
     method: "POST",
   });
@@ -43,7 +43,7 @@ export const fetchDocuments = createAsyncThunk(
 );
 
 export const deleteDocument = createAsyncThunk(
-  "hr/deleteDocument",
+  "api/hr/deleteDocument",
   async (id) => {
     const res = await fetch(`http://localhost:5400/api/documents/${id}`, {
       method: "DELETE",

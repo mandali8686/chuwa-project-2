@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import logger from "redux-logger";
-import hrReducer from "./hrSlice";
+import hrReducer from "../features/hr/hrSlice";
 
 const store = configureStore({
   reducer: {

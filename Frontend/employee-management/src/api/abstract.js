@@ -99,3 +99,31 @@ export function makeHTTPDELETERequest(endpoint, queryParams ={}){
         })
 }
 
+
+export function makeHTTPPATCHRequest(endpoint, bodyParams = {}) {
+    const token = localStorage.getItem('token');
+    const url = new URL(API_URL + endpoint);
+
+    const headers = new Headers({
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+    });
+
+    const options = {
+        method: "PATCH",
+        headers: headers,
+        body: JSON.stringify(bodyParams),
+    };
+
+    return fetch(url, options)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
+            }
+            return response.json();
+        })
+        .catch((error) => {
+            console.error("Error Patching:", error);
+            throw error;
+        });
+}
