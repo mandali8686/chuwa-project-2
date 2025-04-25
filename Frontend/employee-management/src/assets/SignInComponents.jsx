@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { Form, Card } from 'antd';
+import { Form, Card, Typography } from 'antd';
+const { Title } = Typography;
 
 /* Auth Container */
 export const AuthContainer = styled.div`
@@ -45,4 +46,24 @@ export const CardContainer = styled(Card)`
   border: none;
   box-shadow: none;
 `;
+
+export const PageContainer = styled.div`
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 24px;
+`;
+
+export const SectionTitle = styled(Title)`
+  && {
+    color: #8b5e3c;
+    margin-bottom: 16px;
+  }
+`;
+
+export const InfoCard = styled(Card)`
+  margin-bottom: 24px;
+  border-radius: 10px;
+`;
+
+
 

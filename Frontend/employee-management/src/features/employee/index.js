@@ -61,7 +61,7 @@ export const updateUser = createAsyncThunk(
   'user/updateUser',
   async ({ userId, updatedData }, { rejectWithValue }) => {
     try {
-      const data = await makeHTTPPATCHRequest(`api/employees/${userId}`, updatedData);
+      const data = await makeHTTPPUTRequest(`api/employees/${userId}`, updatedData);
       return data;
     } catch (e) {
       return rejectWithValue(e.message);

@@ -3,6 +3,7 @@ const OnboardingToken = require("../models/OnboardingToken");
 const Employee = require("../models/Employees");
 const nodemailer = require('nodemailer');
 const { createEmployee } = require('./Employees');
+const jwt = require('jsonwebtoken');
 
 exports.getAllEmployees = async (req, res) => {
   try {
@@ -15,54 +16,54 @@ exports.getAllEmployees = async (req, res) => {
 
 
 exports.createOnboardingTokenAndSendEmail = async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ msg: "Email is required" });
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ msg: "Email is required" });
+  
+    try {
+      const newEmployee = await createEmployee({
+        email,
+        username: email.split('@')[0],
+        password: '12345'
+      });
+  
+      const token = jwt.sign(
+        { employeeId: newEmployee._id, email }, 
+        process.env.JWT_SECRET, 
+        { expiresIn: '24h' }  
+      );
+  
+      const resetLink = `http://localhost:5173/register/${token}`;
 
-  try {
-    const token = uuidv4();
-    const newToken = new OnboardingToken({ email, token });
-    await newToken.save();
-
-    const newEmployee = await createEmployee({
-      email,
-      username: email.split('@')[0],
-      password: '12345'
-    });
-
-    const resetLink = `http://localhost:5173/register/${token}`;
-
-    console.log('Going to mailer', process.env.EMAIL_USER, process.env.EMAIL_PWD);
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PWD
-      }
-    });
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Password Reset Request',
-      html: `
-        <h2>Password Reset</h2>
-        <p>Click the link below to reset your password. This link is valid for 15 minutes.</p>
-        <a href="${resetLink}">${resetLink}</a>
-      `
-    };
-
-    await transporter.sendMail(mailOptions);
-    console.log('Sent');
-
-    res.status(201).json({
-      message: 'Onboarding token created and reset email sent successfully.',
-      token,
-      employeeId: newEmployee._id
-    });
-  } catch (err) {
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
-};
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PWD
+        }
+      });
+  
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Complete Your Registration',
+        html: `
+          <h2>Complete Your Registration</h2>
+          <p>Click the link below to finish setting up your account. This link is valid for 15 minutes.</p>
+          <a href="${resetLink}">${resetLink}</a>
+        `
+      };
+  
+      await transporter.sendMail(mailOptions);
+  
+      res.status(201).json({
+        message: 'Onboarding token created and email sent successfully.',
+        token, 
+        employeeId: newEmployee._id
+      });
+    } catch (err) {
+      res.status(500).json({ msg: "Server error", error: err.message });
+    }
+  };
 
 
 exports.updateEmployeeOnboardingStatus = async (req, res) => {
