@@ -23,6 +23,7 @@ export function makeHTTPPOSTRequest(endpoint, bodyParams={}){
     const token = localStorage.getItem('token');
     const url = new URL(API_URL + endpoint); 
     console.log(`POST Request to ${url}`, token);
+    console.log('body:', JSON.stringify(bodyParams))
     const headers = new Headers({
         Authorization: `Bearer ${token}`,
         "Content-Type" : "application/json",
