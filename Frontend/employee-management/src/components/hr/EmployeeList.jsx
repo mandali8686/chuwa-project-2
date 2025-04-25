@@ -1,7 +1,7 @@
 // src/components/hr/EmployeeList.jsx
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchEmployees, reviewEmployee } from "../../redux/hrSlice";
+import { fetchEmployees, reviewEmployee } from "../../features/hr/hrSlice";
 
 const EmployeeList = () => {
   const dispatch = useDispatch();

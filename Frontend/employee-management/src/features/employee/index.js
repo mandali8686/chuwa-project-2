@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { makeHTTPPOSTRequest, makeHTTPPUTRequest, makeHTTPGETRequest } from '../../api/abstract';
+import { makeHTTPPOSTRequest, makeHTTPPUTRequest, makeHTTPGETRequest, makeHTTPPATCHRequest } from '../../api/abstract';
 
 const initialState = {
   token: null,
@@ -13,7 +13,7 @@ export const createUserAsync = createAsyncThunk(
   'user/createUser',
   async (userData, { rejectWithValue }) => {
     try {
-      const data = await makeHTTPPOSTRequest('api/users', userData);
+      const data = await makeHTTPPOSTRequest('api/employees', userData);
       return data;
     } catch (e) {
       return rejectWithValue(e.message);
@@ -49,7 +49,7 @@ export const updatePassword = createAsyncThunk(
   'user/updatePassword',
   async ({ userId, newPassword }, { rejectWithValue }) => {
     try {
-      const data = await makeHTTPPUTRequest(`api/users/${userId}`, { password: newPassword });
+      const data = await makeHTTPPUTRequest(`api/employees/${userId}`, { password: newPassword });
       return data;
     } catch (e) {
       return rejectWithValue(e.message);
@@ -57,17 +57,29 @@ export const updatePassword = createAsyncThunk(
   }
 );
 
-export const sendResetEmail = createAsyncThunk(
-  'user/sendResetEmail',
-  async (email, { rejectWithValue }) => {
+export const updateUser = createAsyncThunk(
+  'user/updateUser',
+  async ({ userId, updatedData }, { rejectWithValue }) => {
     try {
-      const data = await makeHTTPPOSTRequest('/api/users/reset-password', { email });
+      const data = await makeHTTPPATCHRequest(`api/employees/${userId}`, updatedData);
       return data;
     } catch (e) {
       return rejectWithValue(e.message);
     }
   }
 );
+
+// export const sendResetEmail = createAsyncThunk(
+//   'user/sendResetEmail',
+//   async (email, { rejectWithValue }) => {
+//     try {
+//       const data = await makeHTTPPOSTRequest('/api/users/reset-password', { email });
+//       return data;
+//     } catch (e) {
+//       return rejectWithValue(e.message);
+//     }
+//   }
+// );
 
 const userSlice = createSlice({
   name: 'user',
@@ -131,18 +143,31 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload || action.error.message;
       })
-      .addCase(sendResetEmail.pending, (state) => {
+      .addCase(updateUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(sendResetEmail.fulfilled, (state) => {
+      .addCase(updateUser.fulfilled, (state, action) => {
         state.loading = false;
+        state.currentUser = action.payload;
         state.error = null;
       })
-      .addCase(sendResetEmail.rejected, (state, action) => {
+      .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
       })
+      // .addCase(sendResetEmail.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      // })
+      // .addCase(sendResetEmail.fulfilled, (state) => {
+      //   state.loading = false;
+      //   state.error = null;
+      // })
+      // .addCase(sendResetEmail.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error = action.payload || action.error.message;
+      // })
       .addCase(getUserById.pending, (state) => {
         state.loading = true;
         state.error = null;

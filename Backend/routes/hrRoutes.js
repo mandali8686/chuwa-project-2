@@ -52,7 +52,7 @@ router.post("/token", async (req, res) => {
       await transporter.sendMail(mailOptions);
       res.json({ message: 'Reset email sent successfully.' });
 
-    res.status(201).json({ token });
+    // res.status(201).json({ token });
   } catch (err) {
     res.status(500).json({ msg: "Server error", err });
   }
