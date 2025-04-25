@@ -106,4 +106,4 @@ const hrSlice = createSlice({
   },
 });
 
-export default hrSlice.reducer;
+export const hrReducer= hrSlice.reducer;
