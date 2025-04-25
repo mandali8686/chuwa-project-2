@@ -9,7 +9,9 @@ import { AuthContainer, StyledForm, ResponsiveFooter, CardContainer } from '../.
 const { Title } = Typography;
 
 const SignIn = () => {
-  const { error, isAuthenticated } = useSelector((state) => state.user);
+  const userState = useSelector((state) => state.user) || {};
+  const { error, isAuthenticated } = userState;
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   useEffect(() => {
