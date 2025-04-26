@@ -44,6 +44,25 @@ exports.updateEmployee = async (req, res) => {
   }
 };
 
+//Patch for Partial Update
+exports.updateEmployeePart = async (req, res) => {
+  try {
+    const updatedEmployee = await Employee.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },  // Only update the fields provided in req.body
+      { new: true, runValidators: true }
+    );
+    
+    if (!updatedEmployee) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+    
+    res.json(updatedEmployee);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
 // Delete an employee
 exports.deleteEmployee = async (req, res) => {
   try {
