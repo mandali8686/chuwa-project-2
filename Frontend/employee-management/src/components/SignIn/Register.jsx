@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Form, Input, Button, Typography, message } from 'antd';
 import { updateUser } from '../../features/employee/index';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { CardContainer, AuthContainer, StyledForm, SectionTitle, InfoCard } from '../../assets/SignInComponents';
 
@@ -14,6 +14,7 @@ const Register = () => {
   const [form] = Form.useForm();
   const decoded = jwtDecode(token);
   const { employeeId, email } = decoded;
+  const navigate = useNavigate();
 
   useEffect(() => {
     form.setFieldsValue({ email });  
@@ -38,6 +39,7 @@ const Register = () => {
       .catch((error) => {
         message.error(`Error: ${error}`);
       });
+    navigate('/application');
   };
 
   return (

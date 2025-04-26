@@ -69,6 +69,19 @@ export const updateUser = createAsyncThunk(
   }
 );
 
+export const patchUser = createAsyncThunk(
+  'user/patchUser',
+  async ({ userId, updatedData }, { rejectWithValue }) => {
+    try {
+      const data = await makeHTTPPATCHRequest(`api/employees/${userId}`, updatedData);
+      return data;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  }
+);
+
+
 // export const sendResetEmail = createAsyncThunk(
 //   'user/sendResetEmail',
 //   async (email, { rejectWithValue }) => {
@@ -156,6 +169,20 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload || action.error.message;
       })
+      .addCase(patchUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(patchUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentUser = action.payload;
+        state.error = null;
+      })
+      .addCase(patchUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+
       // .addCase(sendResetEmail.pending, (state) => {
       //   state.loading = true;
       //   state.error = null;
