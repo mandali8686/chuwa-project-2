@@ -1,61 +1,74 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { makeHTTPGETRequest, makeHTTPPOSTRequest } from "../../api/abstract";
-
+import {
+  makeHTTPGETRequest,
+  makeHTTPPOSTRequest,
+  makeHTTPPATCHRequest,
+  makeHTTPDELETERequest,
+} from "../../api/abstract";
 
 export const fetchEmployees = createAsyncThunk(
   "api/hr/fetchEmployees",
-  async () => {
-    const res = await fetch("http://localhost:5400/api/hr/employees");
-    if (!res.ok) throw new Error("Failed to fetch employees");
-    return await res.json();
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await makeHTTPGETRequest("api/hr/employees");
+      return data;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
   }
 );
 
 export const reviewEmployee = createAsyncThunk(
   "api/hr/reviewEmployee",
-  async ({ id, updates }) => {
-    const res = await fetch(`http://localhost:5400/api/hr/employees/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updates),
-    });
-    if (!res.ok) throw new Error("Failed to review employee");
-    return await res.json();
-  }
-);
-
-export const generateToken = createAsyncThunk(
-  "api/hr/generateToken", async ({ email }, { rejectWithValue }) => {
+  async ({ id, updates }, { rejectWithValue }) => {
     try {
-      console.log('Useremail', email);
-      const data = await makeHTTPPOSTRequest('api/hr/token', { email });
+      const data = await makeHTTPPATCHRequest(
+        `api/hr/employees/${id}`,
+        updates
+      );
       return data;
     } catch (e) {
       return rejectWithValue(e.message);
     }
-  });
+  }
+);
+
+export const generateToken = createAsyncThunk(
+  "api/hr/generateToken",
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const data = await makeHTTPPOSTRequest("api/hr/token", { email });
+      return data;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  }
+);
 
 export const fetchDocuments = createAsyncThunk(
   "hr/fetchDocuments",
-  async () => {
-    const res = await fetch("http://localhost:5400/api/documents");
-    if (!res.ok) throw new Error("Failed to fetch documents");
-    return await res.json();
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await makeHTTPGETRequest("api/documents");
+      return data;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
   }
 );
 
 export const deleteDocument = createAsyncThunk(
   "api/hr/deleteDocument",
-  async (id) => {
-    const res = await fetch(`http://localhost:5400/api/documents/${id}`, {
-      method: "DELETE",
-    });
-    if (!res.ok) throw new Error("Failed to delete document");
-    return id;
+  async (id, { rejectWithValue }) => {
+    try {
+      await makeHTTPDELETERequest(`api/documents/${id}`);
+      return id;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
   }
 );
 
-// --------------------- Slice ---------------------
 const hrSlice = createSlice({
   name: "hr",
   initialState: {
@@ -68,7 +81,6 @@ const hrSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Employees
       .addCase(fetchEmployees.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -79,27 +91,19 @@ const hrSlice = createSlice({
       })
       .addCase(fetchEmployees.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
       })
-
-      // Review Employee
       .addCase(reviewEmployee.fulfilled, (state, action) => {
         const updated = action.payload;
         const index = state.employees.findIndex((e) => e._id === updated._id);
         if (index !== -1) state.employees[index] = updated;
       })
-
-      // Generate Token
       .addCase(generateToken.fulfilled, (state, action) => {
         state.onboardingToken = action.payload.token;
       })
-
-      // Fetch Documents
       .addCase(fetchDocuments.fulfilled, (state, action) => {
         state.documents = action.payload;
       })
-
-      // Delete Document
       .addCase(deleteDocument.fulfilled, (state, action) => {
         state.documents = state.documents.filter(
           (doc) => doc._id !== action.payload
@@ -108,4 +112,4 @@ const hrSlice = createSlice({
   },
 });
 
-export const hrReducer= hrSlice.reducer;
+export const hrReducer = hrSlice.reducer;
