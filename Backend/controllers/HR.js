@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const OnboardingToken = require("../models/OnboardingToken");
 const Employee = require("../models/Employees");
 const nodemailer = require('nodemailer');
-const { createEmployee } = require('./Employees');
+const { createEmployeeHelper } = require('./Employees');
 const jwt = require('jsonwebtoken');
 
 exports.getAllEmployees = async (req, res) => {
@@ -20,7 +20,7 @@ exports.createOnboardingTokenAndSendEmail = async (req, res) => {
     if (!email) return res.status(400).json({ msg: "Email is required" });
   
     try {
-      const newEmployee = await createEmployee({
+      const newEmployee = await createEmployeeHelper({
         email,
         username: email.split('@')[0],
         password: '12345'

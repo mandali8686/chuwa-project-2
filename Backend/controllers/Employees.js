@@ -22,16 +22,22 @@ exports.getEmployeeById = async (req, res) => {
 };
 
 // Create a new employee
-exports.createEmployee = async (employeeData) => {
+exports.createEmployee = async (req, res) => {
   try {
-    const newEmployee = new Employee(employeeData);
+    const newEmployee = new Employee(req.body); 
     await newEmployee.save();
-    console.log('Emp Ctrl:', newEmployee);
-    return newEmployee; 
+    res.status(201).json(newEmployee);  
   } catch (err) {
-    throw new Error(err.message); 
+    res.status(400).json({ error: err.message });
   }
 };
+
+exports.createEmployeeHelper = async (employeeData) => {
+  const newEmployee = new Employee(employeeData);
+  await newEmployee.save();
+  return newEmployee;
+};
+
 
 // Update an existing employee
 exports.updateEmployee = async (req, res) => {
@@ -46,10 +52,12 @@ exports.updateEmployee = async (req, res) => {
 
 //Patch for Partial Update
 exports.updateEmployeePart = async (req, res) => {
+  console.log("PATCH Request received for ID:", req.params.id);
+  console.log("Payload (req.body):", req.body);
   try {
     const updatedEmployee = await Employee.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },  // Only update the fields provided in req.body
+      { $set: req.body }, 
       { new: true, runValidators: true }
     );
     

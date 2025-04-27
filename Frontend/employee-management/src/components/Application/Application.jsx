@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Form, Input, Button, Select, DatePicker, Typography, Card, message } from 'antd';
+import { Form, Input, Button, Select, DatePicker, Typography, Card, message, Upload } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
-import moment from 'moment';
-import { createUserAsync } from '../../features/employee/index';
+import { patchUser } from '../../features/employee/index';
+import { storage } from '../../firebase/firebaseConfig';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const { Title } = Typography;
 const { Option } = Select;
 
-// Styled Components
 const PageContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
@@ -30,40 +31,86 @@ const InfoCard = styled(Card)`
 const Application = () => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const userId = localStorage.getItem('userId');
+  const [fileList, setFileList] = useState([]);
+  const [docType, setDocType] = useState('Visa'); 
 
-  const onFinish = (values) => {
+  useEffect(() => {
+    if (!userId) {
+      message.error('User ID not found. Please log in again.');
+    }
+  }, [userId]);
+
+  const handleFileChange = ({ fileList }) => {
+    setFileList(fileList);
+  };
+
+  const uploadDocumentsToFirebase = async (files) => {
+    const uploadedDocs = [];
+    for (const fileObj of files) {
+      const file = fileObj.originFileObj;
+      const storageRef = ref(storage, `documents/${userId}/${file.name}`);
+      await uploadBytes(storageRef, file);
+      const downloadUrl = await getDownloadURL(storageRef);
+      uploadedDocs.push({
+        docType,              
+        fileName: file.name,
+        fileData: downloadUrl, 
+      });
+    }
+    return uploadedDocs;
+  };
+
+  const onFinish = async (values) => {
+    if (!userId) {
+      message.error('User ID missing.');
+      return;
+    }
+
+    let uploadedDocuments = [];
+    try {
+      if (fileList.length > 0) {
+        uploadedDocuments = await uploadDocumentsToFirebase(fileList);
+      }
+    } catch (error) {
+      message.error('Error uploading documents');
+      return;
+    }
+
     const payload = {
-      username: values.username,
-      email: values.email,
-      password: values.password,
-      personalInfo: {
-        firstName: values.firstName,
-        lastName: values.lastName,
-        middleName: values.middleName || '',
-        preferredName: values.preferredName || '',
-        address: {
-          building: values.building || '',
-          street: values.street,
-          city: values.city,
-          state: values.state,
-          zip: values.zip,
+      userId,
+      updatedData: {
+        personalInfo: {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          middleName: values.middleName || '',
+          preferredName: values.preferredName || '',
+          address: {
+            building: values.building || '',
+            street: values.street,
+            city: values.city,
+            state: values.state,
+            zip: values.zip,
+          },
+          cellPhone: values.cellPhone,
+          workPhone: values.workPhone || '',
         },
-        cellPhone: values.cellPhone,
-        workPhone: values.workPhone || '',
-      },
-      visa: {
-        isCitizenOrResident: values.isCitizenOrResident === 'Yes',
-        visaType: values.visaType || '',
-        startDate: values.visaStartDate ? values.visaStartDate.format('YYYY-MM-DD') : null,
-        endDate: values.visaEndDate ? values.visaEndDate.format('YYYY-MM-DD') : null,
+        visa: {
+          isCitizenOrResident: values.isCitizenOrResident === 'Yes',
+          visaType: values.visaType || '',
+          startDate: values.visaStartDate ? values.visaStartDate.format('YYYY-MM-DD') : null,
+          endDate: values.visaEndDate ? values.visaEndDate.format('YYYY-MM-DD') : null,
+          documents: uploadedDocuments, 
+        },
       },
     };
 
-    dispatch(createUserAsync(payload))
+    dispatch(patchUser(payload))
       .unwrap()
       .then(() => {
-        message.success('Application submitted successfully!');
+        message.success('Application updated successfully!');
         form.resetFields();
+        setFileList([]);
       })
       .catch((error) => {
         message.error(`Error: ${error}`);
@@ -74,19 +121,8 @@ const Application = () => {
     <PageContainer>
       <SectionTitle level={2}>Employee Application Form</SectionTitle>
       <Form layout="vertical" onFinish={onFinish} form={form}>
-        <InfoCard title="Account Information">
-          <Form.Item name="username" label="Username" rules={[{ required: true }]}>
-            <Input placeholder="Enter username" />
-          </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
-            <Input placeholder="Enter email" />
-          </Form.Item>
-          <Form.Item name="password" label="Password" rules={[{ required: true }]}>
-            <Input.Password placeholder="Enter password" />
-          </Form.Item>
-        </InfoCard>
-
         <InfoCard title="Personal Information">
+          
           <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
@@ -108,6 +144,7 @@ const Application = () => {
         </InfoCard>
 
         <InfoCard title="Address">
+          
           <Form.Item name="building" label="Building / Apt #">
             <Input />
           </Form.Item>
@@ -125,7 +162,8 @@ const Application = () => {
           </Form.Item>
         </InfoCard>
 
-        <InfoCard title="Visa Information">
+        <InfoCard title="Visa Information & Document Upload">
+          
           <Form.Item name="isCitizenOrResident" label="Citizen / Resident" rules={[{ required: true }]}>
             <Select placeholder="Select Yes or No">
               <Option value="Yes">Yes</Option>
@@ -140,6 +178,27 @@ const Application = () => {
           </Form.Item>
           <Form.Item name="visaEndDate" label="Visa End Date">
             <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+
+          
+          <Form.Item label="Document Type">
+            <Select value={docType} onChange={setDocType}>
+              <Option value="Passport">Passport</Option>
+              <Option value="I-9">I-9</Option>
+              <Option value="EAD">EAD</Option>
+              <Option value="Visa">Visa</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item label="Upload Visa Documents">
+            <Upload
+              multiple
+              beforeUpload={() => false}
+              onChange={handleFileChange}
+              fileList={fileList}
+              listType="text"
+            >
+              <Button icon={<UploadOutlined />}>Select Files</Button>
+            </Upload>
           </Form.Item>
         </InfoCard>
 

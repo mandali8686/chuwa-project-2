@@ -39,6 +39,7 @@ const Register = () => {
       .catch((error) => {
         message.error(`Error: ${error}`);
       });
+    localStorage.setItem('userId', employeeId);
     navigate('/application');
   };
 

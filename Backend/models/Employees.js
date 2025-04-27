@@ -58,8 +58,8 @@ const employeeSchema = new Schema(
         onboading:{
             status:{
                 type: String, 
-                enum:['Pending', 'Approved', 'Rejected'],
-                default: 'Pending'
+                enum:['Unsubmitted','Pending', 'Approved', 'Rejected'],
+                default: 'Unsubmitted'
             },
             feedback: String
            },
