@@ -54,6 +54,13 @@ const employeeSchema = new Schema(
            },
            cellPhone: String,
            workPhone: String,
+           SSN: String,
+           dateOfBirth: Date,
+           gender: {
+            type: String, 
+            enum:['Male', 'Female', 'Not Declared'],
+            default: 'Not Declared'
+        },
         },
         onboading:{
             status:{

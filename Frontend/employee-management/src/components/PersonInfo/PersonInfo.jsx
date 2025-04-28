@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Card, Typography, Descriptions, Spin, Alert, Button, Input, message, Upload } from 'antd';
+import { Card, Typography, Descriptions, Spin, Alert, Button, Input, message, Upload, DatePicker, Select } from 'antd';
 import styled from '@emotion/styled';
 import { getUserById } from '../../features/employee/index';  
 import { useParams, useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { patchUser } from '../../features/employee/index';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../firebase/firebaseConfig';
+import dayjs from 'dayjs';
 
 const { Title } = Typography;
 const TopBar = styled.div`
@@ -81,7 +82,10 @@ const PersonalInformation = () => {
     profilePictue,
     address = {},
     cellPhone,
-    workPhone
+    workPhone,
+    SSN,
+    dateOfBirth,
+    gender
   } = personalInfo;
 
   const handleEditClick = (section) => {
@@ -300,6 +304,43 @@ const PersonalInformation = () => {
               workPhone || '-'
             )}
           </Descriptions.Item>
+          <Descriptions.Item label="SSN">
+            {editingSection === 'personalInfo' ? (
+              <Input
+                value={editValues.personalInfo?.SSN || ''}
+                onChange={(e) => handleFieldChange('personalInfo.SSN', e.target.value)}
+              />
+            ) : (
+              SSN || '-'
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Date of Birth">
+          {editingSection === 'personalInfo' ? (
+            <DatePicker
+              style={{ width: '100%' }}
+              value={editValues.personalInfo?.dateOfBirth ? dayjs(editValues.personalInfo.dateOfBirth) : null}
+              onChange={(date) => handleFieldChange('personalInfo.dateOfBirth', date ? date.toISOString() : '')}
+            />
+          ) : (
+            dateOfBirth ? dayjs(dateOfBirth).format('YYYY-MM-DD') : '-'
+          )}
+        </Descriptions.Item>
+
+        <Descriptions.Item label="Gender">
+          {editingSection === 'personalInfo' ? (
+            <Select
+              value={editValues.personalInfo?.gender || ''}
+              onChange={(value) => handleFieldChange('personalInfo.gender', value)}
+              style={{ width: '100%' }}
+            >
+              <Select.Option value="Male">Male</Select.Option>
+              <Select.Option value="Female">Female</Select.Option>
+              <Select.Option value="Not Declared">Not Declared</Select.Option>
+            </Select>
+          ) : (
+            gender || '-'
+          )}
+        </Descriptions.Item>
         </Descriptions>
       </InfoCard>
 

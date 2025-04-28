@@ -99,7 +99,6 @@ const NavBar = () => {
         <Menu.Item key="employee-profiles">Profile</Menu.Item>
         <Menu.Item key="visa-status">Visa Status Management</Menu.Item> 
       </StyledMenu>
-
       </MenuContainer>
     </NavBarContainer>
   );
