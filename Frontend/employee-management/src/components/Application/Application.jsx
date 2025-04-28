@@ -161,6 +161,9 @@ const Application = () => {
           },
           cellPhone: values.cellPhone,
           workPhone: values.workPhone || '',
+          SSN: values.SSN || '',
+          dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
+          gender: values.gender || 'Not Declared',
         },
         onboading: {
             status: "Pending"
@@ -211,27 +214,40 @@ const Application = () => {
     <PageContainer>
       <SectionTitle level={2}>Employee Application Form</SectionTitle>
       <Form layout="vertical" onFinish={onFinish} form={form}>
-        <InfoCard title="Personal Information">
-          
-          <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="lastName" label="Last Name" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="middleName" label="Middle Name">
-            <Input />
-          </Form.Item>
-          <Form.Item name="preferredName" label="Preferred Name">
-            <Input />
-          </Form.Item>
-          <Form.Item name="cellPhone" label="Cell Phone" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="workPhone" label="Work Phone">
-            <Input />
-          </Form.Item>
-        </InfoCard>
+      <InfoCard title="Personal Information">
+        <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item name="lastName" label="Last Name" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item name="middleName" label="Middle Name">
+          <Input />
+        </Form.Item>
+        <Form.Item name="preferredName" label="Preferred Name">
+          <Input />
+        </Form.Item>
+        <Form.Item name="cellPhone" label="Cell Phone" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item name="workPhone" label="Work Phone">
+          <Input />
+        </Form.Item>
+        <Form.Item name="SSN" label="SSN" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item name="dateOfBirth" label="Date of Birth" rules={[{ required: true }]}>
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+        <Form.Item name="gender" label="Gender" rules={[{ required: true }]}>
+          <Select placeholder="Select Gender">
+            <Option value="Male">Male</Option>
+            <Option value="Female">Female</Option>
+            <Option value="Not Declared">Not Declared</Option>
+          </Select>
+        </Form.Item>
+      </InfoCard>
+
         <InfoCard title="Profile Picture Upload">
         <Form.Item label="Upload Profile Picture">
           <Upload
