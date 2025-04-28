@@ -1,13 +1,24 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { makeHTTPPOSTRequest, makeHTTPPUTRequest, makeHTTPGETRequest, makeHTTPPATCHRequest } from '../../api/abstract';
 
+const storedUser = JSON.parse(localStorage.getItem('currentUser'));
+const storedToken = localStorage.getItem('token');
+
 const initialState = {
-  token: null,
+  token: storedToken || null,
   loading: false,
-  currentUser: null,
-  isAuthenticated: false,
+  currentUser: storedUser || null,
+  isAuthenticated: !!storedToken,
   error: null
 };
+
+// const initialState = {
+//   token: null,
+//   loading: false,
+//   currentUser: null,
+//   isAuthenticated: false,
+//   error: null
+// };
 
 export const createUserAsync = createAsyncThunk(
   'user/createUser',
