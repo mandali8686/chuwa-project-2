@@ -98,6 +98,9 @@ const Application = () => {
           cellPhone: values.cellPhone,
           workPhone: values.workPhone || '',
         },
+        onboading: {
+            status: "Pending"
+        },
         visa: {
           isCitizenOrResident: values.isCitizenOrResident === 'Yes',
           visaType: values.visaType || '',

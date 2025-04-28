@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchEmployees, reviewEmployee } from "../../features/hr/hrSlice";
+import { fetchEmployees } from "../../features/hr/hrSlice";
+import { patchUser } from "../../features/employee/index"; 
 import { PageContainer, InfoCard, SectionTitle } from "../../assets/SignInComponents";
 import { Typography, Select, Input, Spin, Alert, Button, List } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -17,12 +18,19 @@ const EmployeeList = () => {
     dispatch(fetchEmployees());
   }, [dispatch]);
 
-  const handleChange = (id, field, value) => {
-    dispatch(reviewEmployee({ id, field, value }));
+  const handleChange = (userId, field, value) => {
+    dispatch(
+      patchUser({
+        userId,
+        updatedData: {
+          onboading: { [field]: value },
+        },
+      })
+    );
   };
 
   const handlePreviewOrDownload = (url) => {
-    window.open(url, "_blank");  
+    window.open(url, "_blank");
   };
 
   return (
@@ -30,7 +38,7 @@ const EmployeeList = () => {
       <Button
         type="primary"
         onClick={() => navigate("/hr/dashboard")}
-        style={{ minWidth: "200px" }}
+        style={{ minWidth: "200px", marginBottom: "16px" }}
       >
         Dashboard
       </Button>
@@ -50,15 +58,15 @@ const EmployeeList = () => {
               <strong>Email:</strong> {emp.email}
             </Paragraph>
             <Paragraph>
-              <strong>Status:</strong> {emp.onboarding?.status || "N/A"}
+              <strong>Status:</strong> {emp.onboading?.status || "N/A"}
             </Paragraph>
             <Paragraph>
-              <strong>Feedback:</strong> {emp.onboarding?.feedback || "N/A"}
+              <strong>Feedback:</strong> {emp.onboading?.feedback || "N/A"}
             </Paragraph>
 
             <div style={{ marginTop: 16, marginBottom: 24 }}>
               <Select
-                defaultValue={emp.onboarding?.status || "Pending"}
+                defaultValue={emp.onboading?.status || "Pending"}
                 style={{ width: 180, marginRight: 16 }}
                 onChange={(value) => handleChange(emp._id, "status", value)}
               >
@@ -69,7 +77,7 @@ const EmployeeList = () => {
 
               <Input
                 placeholder="Feedback"
-                defaultValue={emp.onboarding?.feedback || ""}
+                defaultValue={emp.onboading?.feedback || ""}
                 style={{ width: 300 }}
                 onBlur={(e) => handleChange(emp._id, "feedback", e.target.value)}
               />
