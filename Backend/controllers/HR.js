@@ -29,7 +29,7 @@ exports.createOnboardingTokenAndSendEmail = async (req, res) => {
       const token = jwt.sign(
         { employeeId: newEmployee._id, email }, 
         process.env.JWT_SECRET, 
-        { expiresIn: '24h' }  
+        { expiresIn: '3h' }  
       );
   
       const resetLink = `http://localhost:5173/register/${token}`;
@@ -48,7 +48,7 @@ exports.createOnboardingTokenAndSendEmail = async (req, res) => {
         subject: 'Complete Your Registration',
         html: `
           <h2>Complete Your Registration</h2>
-          <p>Click the link below to finish setting up your account. This link is valid for 15 minutes.</p>
+          <p>Click the link below to finish setting up your account. This link is valid for 3 hours.</p>
           <a href="${resetLink}">${resetLink}</a>
         `
       };
