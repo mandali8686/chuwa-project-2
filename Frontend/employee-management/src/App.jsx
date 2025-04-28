@@ -22,13 +22,13 @@ function App() {
         <Route path="/register/:token" element={<Register />} />
 
         {/* Protected Routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/person-info" element={<PersonalInformation />} />
+        {/* <Route element={<ProtectedRoute />}> */}
+          <Route path="/person-info/:id" element={<PersonalInformation />} />
           <Route path="/hr/dashboard" element={<Dashboard />} />
           <Route path="/hr/employees" element={<EmployeeList />} />
           <Route path="/hr/documents" element={<DocumentReview />} />
           <Route path="/hr/register-token" element={<RegisterToken />} />
-        </Route>
+        {/* </Route> */}
       </Route>
     </Routes>
   );
