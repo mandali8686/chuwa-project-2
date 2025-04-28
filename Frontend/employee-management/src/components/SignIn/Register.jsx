@@ -40,7 +40,7 @@ const Register = () => {
         message.error(`Error: ${error}`);
       });
     localStorage.setItem('userId', employeeId);
-    navigate('/application');
+    navigate(`/application/${employeeId}`);
   };
 
   return (

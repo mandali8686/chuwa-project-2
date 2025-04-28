@@ -27,6 +27,7 @@ const MenuContainer = styled.div`
   flex-grow: 1;
   display: flex;
   justify-content: flex-end;
+  margin-right:20px;
   overflow-x: auto;
   .ant-menu {
     flex: none;
@@ -95,9 +96,8 @@ const NavBar = () => {
         selectable={false}
       >
         <Menu.Item key="logout">Logout</Menu.Item>
-        <Menu.Item key="employee-profiles">Employee Profiles</Menu.Item>
+        <Menu.Item key="employee-profiles">Profile</Menu.Item>
         <Menu.Item key="visa-status">Visa Status Management</Menu.Item> 
-        <Menu.Item key="/hiring-management">Hiring Management</Menu.Item>
       </StyledMenu>
 
       </MenuContainer>

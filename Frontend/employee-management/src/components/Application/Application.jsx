@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 import { patchUser } from '../../features/employee/index';
 import { storage } from '../../firebase/firebaseConfig';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { useNavigate } from 'react-router-dom';
+import { useParams,useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -32,10 +32,16 @@ const InfoCard = styled(Card)`
 const Application = () => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  const userId = localStorage.getItem('userId');
-  const [fileList, setFileList] = useState([]);
+  // const userId = localStorage.getItem('userId');
+  // const [fileList, setFileList] = useState([]);
+  const [documents, setDocuments] = useState([{ docType: 'Visa', fileList: [] }]);
+
   const [docType, setDocType] = useState('Visa'); 
   const navigate = useNavigate();
+  const [profileImage, setProfileImage] = useState(null); 
+  const [profileImageUrl, setProfileImageUrl] = useState(''); 
+  const { id: userId } = useParams();
+
 
   useEffect(() => {
     if (!userId) {
@@ -47,11 +53,29 @@ const Application = () => {
     setFileList(fileList);
   };
 
+  const handleDocumentFileChange = (index, { fileList }) => {
+    const newDocuments = [...documents];
+    newDocuments[index].fileList = fileList;
+    setDocuments(newDocuments);
+  };
+  
+  const handleDocTypeChange = (index, value) => {
+    const newDocuments = [...documents];
+    newDocuments[index].docType = value;
+    setDocuments(newDocuments);
+  };
+
+  const addDocumentSection = () => {
+    setDocuments([...documents, { docType: 'Visa', fileList: [] }]);
+  };  
+  
+
   const uploadDocumentsToFirebase = async (files) => {
     const uploadedDocs = [];
     for (const fileObj of files) {
       const file = fileObj.originFileObj;
       const storageRef = ref(storage, `documents/${userId}/${file.name}`);
+      console.log(storageRef);
       await uploadBytes(storageRef, file);
       const downloadUrl = await getDownloadURL(storageRef);
       uploadedDocs.push({
@@ -64,21 +88,60 @@ const Application = () => {
     return uploadedDocs;
   };
 
+  const handleProfileImageChange = ({ fileList }) => {
+    if (fileList.length > 0) {
+      setProfileImage(fileList[0].originFileObj);
+    } else {
+      setProfileImage(null);
+    }
+  };
+  
+  const uploadProfilePicture = async () => {
+    if (profileImage) {
+      const profileRef = ref(storage, `profilePictures/${userId}/${profileImage.name}`);
+      console.log(profileRef);
+      await uploadBytes(profileRef, profileImage);
+      const downloadUrl = await getDownloadURL(profileRef);
+      setProfileImageUrl(downloadUrl);
+      return downloadUrl;
+    }
+    return '';
+  };
+  
+
   const onFinish = async (values) => {
     if (!userId) {
       message.error('User ID missing.');
       return;
     }
-
+  
     let uploadedDocuments = [];
+    let profilePictureUrl = '';
+  
     try {
-      if (fileList.length > 0) {
-        uploadedDocuments = await uploadDocumentsToFirebase(fileList);
+      
+      profilePictureUrl = await uploadProfilePicture();
+      uploadedDocuments = [];
+      for (let doc of documents) {
+        if (doc.fileList.length > 0) {
+          const fileObj = doc.fileList[0].originFileObj;
+          const storageRef = ref(storage, `documents/${userId}/${fileObj.name}`);
+          await uploadBytes(storageRef, fileObj);
+          const downloadUrl = await getDownloadURL(storageRef);
+          uploadedDocuments.push({
+            employeeId: userId,
+            docType: doc.docType,
+            fileName: fileObj.name,
+            fileData: downloadUrl,
+          });
+        }
       }
+
     } catch (error) {
-      message.error('Error uploading documents');
+      message.error('Error uploading files');
       return;
     }
+  
 
     const payload = {
       userId,
@@ -88,6 +151,7 @@ const Application = () => {
           lastName: values.lastName,
           middleName: values.middleName || '',
           preferredName: values.preferredName || '',
+          profilePictue: profilePictureUrl || '',
           address: {
             building: values.building || '',
             street: values.street,
@@ -168,6 +232,19 @@ const Application = () => {
             <Input />
           </Form.Item>
         </InfoCard>
+        <InfoCard title="Profile Picture Upload">
+        <Form.Item label="Upload Profile Picture">
+          <Upload
+            beforeUpload={() => false}
+            onChange={handleProfileImageChange}
+            maxCount={1}
+            listType="picture"
+          >
+            <Button icon={<UploadOutlined />}>Select Profile Picture</Button>
+          </Upload>
+        </Form.Item>
+      </InfoCard>
+
 
         <InfoCard title="Address">
           
@@ -189,7 +266,6 @@ const Application = () => {
         </InfoCard>
 
         <InfoCard title="Visa Information & Document Upload">
-          
           <Form.Item name="isCitizenOrResident" label="Citizen / Resident" rules={[{ required: true }]}>
             <Select placeholder="Select Yes or No">
               <Option value="Yes">Yes</Option>
@@ -206,27 +282,39 @@ const Application = () => {
             <DatePicker style={{ width: '100%' }} />
           </Form.Item>
 
-          
-          <Form.Item label="Document Type">
-            <Select value={docType} onChange={setDocType}>
-              <Option value="Passport">Passport</Option>
-              <Option value="I-9">I-9</Option>
-              <Option value="EAD">EAD</Option>
-              <Option value="Visa">Visa</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item label="Upload Visa Documents">
-            <Upload
-              multiple
-              beforeUpload={() => false}
-              onChange={handleFileChange}
-              fileList={fileList}
-              listType="text"
-            >
-              <Button icon={<UploadOutlined />}>Select Files</Button>
-            </Upload>
-          </Form.Item>
+          <SectionTitle level={4}>Upload Visa Documents</SectionTitle>
+          {documents.map((doc, index) => (
+            <div key={index} style={{ marginBottom: '16px', borderBottom: '1px solid #ddd', paddingBottom: '16px' }}>
+              <Form.Item label={`Document Type ${index + 1}`}>
+                <Select
+                  value={doc.docType}
+                  onChange={(value) => handleDocTypeChange(index, value)}
+                  style={{ width: '200px' }}
+                >
+                  <Option value="Passport">Passport</Option>
+                  <Option value="I-9">I-9</Option>
+                  <Option value="EAD">EAD</Option>
+                  <Option value="Visa">Visa</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item label="Upload Document">
+                <Upload
+                  multiple={false}  // One file per entry
+                  beforeUpload={() => false}
+                  onChange={(info) => handleDocumentFileChange(index, info)}
+                  fileList={doc.fileList}
+                  listType="text"
+                >
+                  <Button icon={<UploadOutlined />}>Select File</Button>
+                </Upload>
+              </Form.Item>
+            </div>
+          ))}
+          <Button type="dashed" onClick={addDocumentSection} block>
+            + Add Another Document
+          </Button>
         </InfoCard>
+
 
         <InfoCard title="Reference Contact">
           <Form.Item name="referenceFirstName" label="First Name" rules={[{ required: true }]}>
