@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Card, Typography, Descriptions, Spin, Alert } from 'antd';
 import styled from '@emotion/styled';
 import { getUserById } from '../../features/employee/index';  // Adjust path if needed
+import { useParams } from 'react-router-dom';
+
 
 const { Title } = Typography;
 
@@ -29,14 +31,14 @@ const PersonalInformation = () => {
   const dispatch = useDispatch();
   const { currentUser, loading, error } = useSelector((state) => state.user);
   console.log('Current user', currentUser);
+  const { id } = useParams(); 
 
   useEffect(() => {
-    // const storedUserId = localStorage.getItem('userId');  
-    if (currentUser && currentUser.userId) {
-        dispatch(getUserById(currentUser.userId));
-        console.log('Confirm getUserById runs for:', currentUser.userId);
-      }
-  }, [dispatch]);
+    if (id) {
+      dispatch(getUserById(id));
+      console.log('Fetching user by ID from route param:', id);
+    }
+  }, [dispatch, id]);
 
   if (loading) {
     return (

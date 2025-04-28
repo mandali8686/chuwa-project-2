@@ -19,10 +19,12 @@ const SignIn = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/person-info");
+    // console.log(userState.currentUser);
+    if (isAuthenticated && userState.currentUser && userState.currentUser.userId) {
+      navigate(`/person-info/${userState.currentUser.userId}`);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, userState.currentUser, navigate]);
+  
 
   const onFinish = async (values) => {
     dispatch(clearError())

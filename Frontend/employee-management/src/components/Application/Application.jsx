@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 import { patchUser } from '../../features/employee/index';
 import { storage } from '../../firebase/firebaseConfig';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -34,6 +35,7 @@ const Application = () => {
   const userId = localStorage.getItem('userId');
   const [fileList, setFileList] = useState([]);
   const [docType, setDocType] = useState('Visa'); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!userId) {
@@ -53,6 +55,7 @@ const Application = () => {
       await uploadBytes(storageRef, file);
       const downloadUrl = await getDownloadURL(storageRef);
       uploadedDocs.push({
+        employeeId: userId,    
         docType,              
         fileName: file.name,
         fileData: downloadUrl, 
@@ -102,6 +105,24 @@ const Application = () => {
           endDate: values.visaEndDate ? values.visaEndDate.format('YYYY-MM-DD') : null,
           documents: uploadedDocuments, 
         },
+        reference: {
+          firstName: values.referenceFirstName,
+          lastName: values.referenceLastName,
+          middleName: values.referenceMiddleName || '',
+          phone: values.referencePhone,
+          email: values.referenceEmail,
+          relationship: values.referenceRelationship,
+        },
+        emergencyContact: [
+          {
+            firstName: values.emergencyFirstName,
+            lastName: values.emergencyLastName,
+            middleName: values.emergencyMiddleName || '',
+            phone: values.emergencyPhone,
+            email: values.emergencyEmail,
+            relationship: values.emergencyRelationship,
+          },
+        ],
       },
     };
 
@@ -115,6 +136,8 @@ const Application = () => {
       .catch((error) => {
         message.error(`Error: ${error}`);
       });
+      console.log('UserID Check', userId);
+      navigate(`/person-info/${userId}`);
   };
 
   return (
@@ -199,6 +222,49 @@ const Application = () => {
             >
               <Button icon={<UploadOutlined />}>Select Files</Button>
             </Upload>
+          </Form.Item>
+        </InfoCard>
+
+        <InfoCard title="Reference Contact">
+          <Form.Item name="referenceFirstName" label="First Name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="referenceLastName" label="Last Name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="referenceMiddleName" label="Middle Name">
+            <Input />
+          </Form.Item>
+          <Form.Item name="referencePhone" label="Phone" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="referenceEmail" label="Email" rules={[{ required: true, type: 'email' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="referenceRelationship" label="Relationship" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+        </InfoCard>
+
+        
+        <InfoCard title="Emergency Contact">
+          <Form.Item name="emergencyFirstName" label="First Name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="emergencyLastName" label="Last Name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="emergencyMiddleName" label="Middle Name">
+            <Input />
+          </Form.Item>
+          <Form.Item name="emergencyPhone" label="Phone" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="emergencyEmail" label="Email" rules={[{ required: true, type: 'email' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="emergencyRelationship" label="Relationship" rules={[{ required: true }]}>
+            <Input />
           </Form.Item>
         </InfoCard>
 
