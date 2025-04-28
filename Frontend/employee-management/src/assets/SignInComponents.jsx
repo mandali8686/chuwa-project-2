@@ -48,7 +48,7 @@ export const CardContainer = styled(Card)`
 `;
 
 export const PageContainer = styled.div`
-  max-width: 500px;
+  max-width: 80%;
   margin: 0 auto;
   padding: 24px;
 `;

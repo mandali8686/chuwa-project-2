@@ -1,7 +1,10 @@
-// src/components/hr/RegisterToken.jsx
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { generateToken } from "../../features/hr/hrSlice";
+import { PageContainer, InfoCard, SectionTitle } from "../../assets/SignInComponents";
+import { Input, Button, Typography, Alert, Spin } from "antd";
+
+const { Paragraph, Text } = Typography;
 
 const RegisterToken = () => {
   const dispatch = useDispatch();
@@ -10,43 +13,50 @@ const RegisterToken = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // console.log('Email in UI',email);
-  if (!email.trim()) {
-    alert("Please enter a valid email address.");
-    return;
-  }
-  dispatch(generateToken({ email:email }));
+    if (!email.trim()) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+    dispatch(generateToken({ email }));
   };
 
   return (
-    <div className="p-8">
-      <h2 className="text-xl font-semibold mb-4">Generate Onboarding Token</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-        <input
-          type="email"
-          placeholder="Enter employee email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="border px-4 py-2"
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Generate
-        </button>
-      </form>
-
-      {token && (
-        <div className="mt-4">
-          <p>🎉 Token Generated:</p>
-          <code className="text-sm text-green-700">{token}</code>
-        </div>
-      )}
-
-      {error && <p className="text-red-600 mt-2">{error}</p>}
-    </div>
+    <PageContainer>
+      <SectionTitle level={2}>Generate Onboarding Token</SectionTitle>
+      <InfoCard>
+        <form onSubmit={handleSubmit}>
+          <Input
+            type="email"
+            placeholder="Enter employee email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{ marginBottom: 16, width: 300 }}
+          />
+          <Button type="primary" htmlType="submit" loading={loading}>
+            Email Token
+          </Button>
+        </form>
+        {token && (
+          <Paragraph style={{ marginTop: 24 }}>
+            🎉 <Text strong>Token Generated:</Text>{" "}
+            <code style={{ color: "#389e0d", background: "#f6ffed", padding: "2px 6px", borderRadius: "4px" }}>
+              {token}
+            </code>
+            Employee Registration Email Sent.
+          </Paragraph>
+        )}
+        {error && (
+          <Alert
+            message="Error"
+            description={error}
+            type="error"
+            showIcon
+            style={{ marginTop: 16 }}
+          />
+        )}
+      </InfoCard>
+    </PageContainer>
   );
 };
 
