@@ -1,37 +1,28 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Card, Typography, Descriptions, Spin, Alert } from 'antd';
+import { Card, Typography, Descriptions, Spin, Alert, Button } from 'antd';
 import styled from '@emotion/styled';
 import { getUserById } from '../../features/employee/index';  // Adjust path if needed
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { PageContainer, InfoCard, SectionTitle } from '../../assets/SignInComponents';
 
 
 const { Title } = Typography;
-
-// Styled Components
-const PageContainer = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 24px;
+const TopBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 `;
 
-const SectionTitle = styled(Title)`
-  && {
-    color: #8b5e3c;
-    margin-bottom: 16px;
-  }
-`;
-
-const InfoCard = styled(Card)`
-  margin-bottom: 24px;
-  border-radius: 10px;
-`;
 
 const PersonalInformation = () => {
   const dispatch = useDispatch();
   const { currentUser, loading, error } = useSelector((state) => state.user);
   console.log('Current user', currentUser);
   const { id } = useParams(); 
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (id) {
@@ -89,7 +80,14 @@ const PersonalInformation = () => {
 
   return (
     <PageContainer>
-      <SectionTitle level={2}>Personal Information</SectionTitle>
+      <TopBar>
+        <SectionTitle level={2}>Personal Information</SectionTitle>
+        {role === 'HR' && (
+          <Button type="primary" onClick={() => navigate('/hr/dashboard')}>
+            Go to HR Dashboard
+          </Button>
+        )}
+      </TopBar>
 
       <InfoCard title="Basic Information">
         <Descriptions column={2}>

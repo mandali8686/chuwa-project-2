@@ -1,11 +1,17 @@
-// src/components/hr/EmployeeList.jsx
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEmployees, reviewEmployee } from "../../features/hr/hrSlice";
+import { PageContainer, InfoCard, SectionTitle } from "../../assets/SignInComponents";
+import { Typography, Select, Input, Spin, Alert, Button, List } from "antd";
+import { useNavigate } from "react-router-dom";
+
+const { Paragraph } = Typography;
+const { Option } = Select;
 
 const EmployeeList = () => {
   const dispatch = useDispatch();
   const { employees, loading, error } = useSelector((state) => state.hr);
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchEmployees());
@@ -15,44 +21,88 @@ const EmployeeList = () => {
     dispatch(reviewEmployee({ id, field, value }));
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  const handlePreviewOrDownload = (url) => {
+    window.open(url, "_blank");  
+  };
 
   return (
-    <div className="p-8">
-      <h2 className="text-xl font-semibold mb-4">Employee List</h2>
-      {employees.map((emp) => (
-        <div key={emp._id} className="border p-4 mb-4">
-          <p>
-            <strong>Username:</strong> {emp.username}
-          </p>
-          <p>
-            <strong>Email:</strong> {emp.email}
-          </p>
-          <p>
-            <strong>Status:</strong> {emp.onboarding?.status || "N/A"}
-          </p>
-          <p>
-            <strong>Feedback:</strong> {emp.onboarding?.feedback || "N/A"}
-          </p>
+    <PageContainer>
+      <Button
+        type="primary"
+        onClick={() => navigate("/hr/dashboard")}
+        style={{ minWidth: "200px" }}
+      >
+        Dashboard
+      </Button>
+      <SectionTitle level={2}>Employee List with Documents</SectionTitle>
 
-          <select
-            onChange={(e) => handleChange(emp._id, "status", e.target.value)}
-            defaultValue={emp.onboarding?.status || "Pending"}
-          >
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-          </select>
+      {loading ? (
+        <Spin tip="Loading employees..." size="large" />
+      ) : error ? (
+        <Alert message="Error" description={error} type="error" showIcon />
+      ) : (
+        employees.map((emp) => (
+          <InfoCard key={emp._id}>
+            <Paragraph>
+              <strong>Username:</strong> {emp.username}
+            </Paragraph>
+            <Paragraph>
+              <strong>Email:</strong> {emp.email}
+            </Paragraph>
+            <Paragraph>
+              <strong>Status:</strong> {emp.onboarding?.status || "N/A"}
+            </Paragraph>
+            <Paragraph>
+              <strong>Feedback:</strong> {emp.onboarding?.feedback || "N/A"}
+            </Paragraph>
 
-          <input
-            placeholder="Feedback"
-            defaultValue={emp.onboarding?.feedback || ""}
-            onBlur={(e) => handleChange(emp._id, "feedback", e.target.value)}
-          />
-        </div>
-      ))}
-    </div>
+            <div style={{ marginTop: 16, marginBottom: 24 }}>
+              <Select
+                defaultValue={emp.onboarding?.status || "Pending"}
+                style={{ width: 180, marginRight: 16 }}
+                onChange={(value) => handleChange(emp._id, "status", value)}
+              >
+                <Option value="Pending">Pending</Option>
+                <Option value="Approved">Approved</Option>
+                <Option value="Rejected">Rejected</Option>
+              </Select>
+
+              <Input
+                placeholder="Feedback"
+                defaultValue={emp.onboarding?.feedback || ""}
+                style={{ width: 300 }}
+                onBlur={(e) => handleChange(emp._id, "feedback", e.target.value)}
+              />
+            </div>
+
+            {/* 🟢 Documents Section */}
+            <SectionTitle level={4}>Uploaded Documents</SectionTitle>
+            {emp.visa?.documents && emp.visa.documents.length > 0 ? (
+              <List
+                size="small"
+                dataSource={emp.visa.documents}
+                renderItem={(doc) => (
+                  <List.Item>
+                    <Paragraph>
+                      <strong>{doc.docType}:</strong> {doc.fileName}
+                      <Button
+                        type="link"
+                        onClick={() => handlePreviewOrDownload(doc.fileData)}
+                        style={{ marginLeft: 12 }}
+                      >
+                        Preview / Download
+                      </Button>
+                    </Paragraph>
+                  </List.Item>
+                )}
+              />
+            ) : (
+              <Paragraph>No documents uploaded.</Paragraph>
+            )}
+          </InfoCard>
+        ))
+      )}
+    </PageContainer>
   );
 };
 

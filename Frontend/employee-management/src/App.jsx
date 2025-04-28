@@ -10,6 +10,7 @@ import Dashboard from "./components/hr/Dashboard";
 import EmployeeList from "./components/hr/EmployeeList";
 import DocumentReview from "./components/hr/DocumentReview";
 import RegisterToken from "./components/hr/RegisterToken";
+import VisaDocuments from "./components/PersonInfo/VisaDocument";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         {/* Protected Routes */}
         {/* <Route element={<ProtectedRoute />}> */}
           <Route path="/person-info/:id" element={<PersonalInformation />} />
+          <Route path="/visa-status/:id" element={<VisaDocuments />} />
           <Route path="/hr/dashboard" element={<Dashboard />} />
           <Route path="/hr/employees" element={<EmployeeList />} />
           <Route path="/hr/documents" element={<DocumentReview />} />
